@@ -569,8 +569,8 @@ contract ArbitrumBitcoinAndStaking is Ownable, IERC20 {
     uint public give0x = 0;
     uint public give = 1;
     // metadata
-    string public name = "Arbitrum Bitcoin and Staking Token";
-    string public constant symbol = "ABAS";
+    string public name = "zkBitcoin";
+    string public constant symbol = "zkBTC";
     uint8 public constant decimals = 18;
 	
     uint256 lastrun = block.timestamp;
