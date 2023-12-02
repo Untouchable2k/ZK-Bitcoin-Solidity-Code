@@ -538,6 +538,7 @@ contract ArbitrumBitcoinAndStaking is Ownable, IERC20 {
     uint256 override public totalSupply = 52500001000000000000000000;
     bytes32 private constant BALANCE_KEY = keccak256("balance");
     //BITCOIN INITALIZE Start
+    mapping(bytes32 => bytes32) public solutionForChallenge;
 	
     uint _totalSupply = 21000000000000000000000000;
     uint public latestDifficultyPeriodStarted2 = block.timestamp; //BlockTime of last readjustment
@@ -554,6 +555,7 @@ contract ArbitrumBitcoinAndStaking is Ownable, IERC20 {
     uint public reward_amount = 2;
     
     //Stuff for Functions
+
 	uint public sentToLP = 0; //Total ABAS sent to LP pool
     uint public multipler = 0; //Multiplier on held Ethereum (more we hold less % we distribute)
     uint public oldecount = 0; //Previous block count for ArewardSender function
@@ -709,9 +711,10 @@ function zinit(address AuctionAddress2, address LPGuild2) public onlyOwner{
 
 		//the digest must be smaller than the target
 		require(uint256(digest) < miningTarget, "Digest must be smaller than miningTarget");
-		_startNewMiningEpoch();
 
-		require(block.timestamp > previousBlockTime, "No same second solves");
+             	solutionForChallenge[challengeNumber] = digest;
+
+		_startNewMiningEpoch();
 		
 		//uint diff = block.timestamp - previousBlockTime;
 		uint256 x = ((block.timestamp - previousBlockTime) * 888) / targetTime;
@@ -802,9 +805,10 @@ function zinit(address AuctionAddress2, address LPGuild2) public onlyOwner{
 
 		//the digest must be smaller than the target
 		require(uint256(digest) < miningTarget, "Digest must be smaller than miningTarget");
-		_startNewMiningEpoch();
 
-		require(block.timestamp > previousBlockTime, "No solve for first 5 seconds.");
+             	solutionForChallenge[challengeNumber] = digest;
+
+		_startNewMiningEpoch();
 		
 		//uint diff = block.timestamp - previousBlockTime;
 		uint256 x = ((block.timestamp - previousBlockTime) * 888) / targetTime;
@@ -977,9 +981,11 @@ function zinit(address AuctionAddress2, address LPGuild2) public onlyOwner{
 
 		//the digest must be smaller than the target
 		require(uint256(digest) < miningTarget, "Digest must be smaller than miningTarget");
+
+             	solutionForChallenge[challengeNumber] = digest;
+
 		_startNewMiningEpoch();
 
-		require(block.timestamp > previousBlockTime, "No same second solves");
 		require(MintTo.length == ExtraFunds.length,"MintTo has to have same number of addressses as ExtraFunds");
 
 		uint xy=0;
@@ -1142,6 +1148,8 @@ function zinit(address AuctionAddress2, address LPGuild2) public onlyOwner{
 			}
 		}
 		challengeNumber = ArbSys(0x0000000000000000000000000000000000000064).arbBlockHash( ArbSys(0x0000000000000000000000000000000000000064).arbBlockNumber() - 1);
+		bytes32 solution = solutionForChallenge[challengeNumber];
+		if(solution != 0x0) revert();  //prevent the same answer from awarding twice
  }
 
 
