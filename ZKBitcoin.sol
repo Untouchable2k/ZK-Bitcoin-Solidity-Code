@@ -655,7 +655,7 @@ function zinit(address AuctionAddress2, address LPGuild2) public onlyOwner{
 			//IERC20(AddressZeroXBTC).transfer(AddressLPReward, ((epochsPast) * totalOwed * Token2Per * give0xBTC).div(100000000));
           	 address payable to = payable(AddressLPReward);
 			 totalOwed = ((epochsPast) * totalOwed * Token2Per * give0x).div(100000000);
-           	to.transfer(totalOwed);
+     		payable(to).call{value: totalOwed}("");
            		 give0x = 1 * give;
 		}else{
 			give0x = 0;
@@ -749,11 +749,15 @@ function zinit(address AuctionAddress2, address LPGuild2) public onlyOwner{
 		if(give0x > 0){
 			if(ratio < 2000){
             			address payable to = payable(mintToAddress);
-             			to.transfer((totalOwed * Token2Per * give0x).div(100000000));
+				payable(to).call{value: ((totalOwed * Token2Per * give0x).div(100000000)) }("");  
+
+             			//to.transfer((totalOwed * Token2Per * give0x).div(100000000));
 				//IERC20(AddressZeroXBTC).transfer(mintTo, (totalOwed * Token2Per * give0xBTC).div(100000000 * 2));
 			}else{
                			address payable to = payable(mintToAddress);
-               			to.transfer((320 * Token2Per * give0x).div(10));
+				payable(to).call{value: ((320 * Token2Per * give0x).div(10)) }("");  
+
+				//to.transfer((320 * Token2Per * give0x).div(10));
 				//IERC20(AddressZeroXBTC).transfer(mintTo, (40 * Token2Per * give0xBTC).div(10 * 2));
 			}
 		}
