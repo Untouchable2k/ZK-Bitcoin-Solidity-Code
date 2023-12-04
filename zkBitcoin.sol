@@ -1096,7 +1096,7 @@ contract zkBitcoin is Ownable, IERC20 {
 			}
 		}
 
-		bytes32 challengeNumber = blockhash(block.number - 1);
+		challengeNumber = blockhash(block.number - 1);
 		bytes32 solution = solutionForChallenge[challengeNumber];
 		if(solution != 0x0) revert();  //prevent the same answer from awarding twice
  	}
