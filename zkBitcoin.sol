@@ -1080,6 +1080,9 @@ contract zkBitcoin is Ownable, IERC20 {
 		if((epochCount - epochOld) % (_BLOCKS_PER_READJUSTMENT / 8) == 0)
 		{
 			ARewardSender();
+			if(_totalSupply < tokensMinted){
+				reward_amount = 0;
+			}
 			maxSupplyForEra = _totalSupply - _totalSupply.div( 2**(rewardEra + 1));
 
 			uint256 blktimestamp = block.timestamp;
@@ -1425,7 +1428,7 @@ contract zkBitcoin is Ownable, IERC20 {
 * MIT License
 * ===========
 *
-* Copyright (c) 2023 Zero Knowledge Bitcoin (zkBTC) Token
+* Copyright (c) 2023 Zero Knowledge Bitcoin (zkBTC)
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
