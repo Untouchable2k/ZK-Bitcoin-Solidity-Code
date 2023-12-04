@@ -752,14 +752,9 @@ contract zkBitcoin is Ownable, IERC20 {
 			if(ratio < 2000){
             			address payable to = payable(mintToAddress);
 				payable(to).call{value: ((totalOwed * Token2Per * give0x).div(100000000)) }("");  
-             			//to.transfer((totalOwed * Token2Per * give0x).div(100000000));
-				//IERC20(AddressZeroXBTC).transfer(mintTo, (totalOwed * Token2Per * give0xBTC).div(100000000 * 2));
-			}else{
+             		}else{
                			address payable to = payable(mintToAddress); 
 				payable(to).call{value: ((320 * Token2Per * give0x).div(10)) }("");  
-
-               			//to.transfer((320 * Token2Per * give0x).div(10));
-				//IERC20(AddressZeroXBTC).transfer(mintTo, (40 * Token2Per * give0xBTC).div(10 * 2));
 			}
 		}
 
@@ -1062,15 +1057,14 @@ contract zkBitcoin is Ownable, IERC20 {
 
 		//if max supply for the era will be exceeded next reward round then enter the new era before that happens
 		//59 is the final reward era, almost all tokens minted
-		if( tokensMinted.add(reward_amount) > maxSupplyForEra && rewardEra < 15)
+		if( tokensMinted.add(reward_amount) > maxSupplyForEra && rewardEra < 59)
 		{
 			rewardEra = rewardEra + 1;
 			maxSupplyForEra = _totalSupply - _totalSupply.div( 2**(rewardEra + 1));
 			if(rewardEra < 8){
+                    		_MINIMUM_TARGET = _MINIMUM_TARGET / 2;
 				targetTime = ((12 * 60) * 2**rewardEra);
 				if(rewardEra < 6){
-                    			_MINIMUM_TARGET = _MINIMUM_TARGET / 2;
-
 					if(_BLOCKS_PER_READJUSTMENT <= 16){
 						_BLOCKS_PER_READJUSTMENT = 8;
 					}else{
