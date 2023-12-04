@@ -506,7 +506,6 @@ contract zkBitcoin is Ownable, IERC20 {
 	
 	
     uint public targetTime = 60 * 12;
-    uint public multipler = 0;
 // SUPPORTING CONTRACTS
     address public AddressAuction;
     zkBTCAuctionsCT public AuctionsCT;
@@ -526,7 +525,7 @@ contract zkBitcoin is Ownable, IERC20 {
     uint _totalSupply = 21000000000000000000000000;
     uint public latestDifficultyPeriodStarted2 = block.timestamp; //BlockTime of last readjustment
     uint public epochCount = 0;//number of 'blocks' mined
-	uint public latestreAdjustStarted = block.timestamp; // shorter blocktime of attempted readjustment
+    uint public latestreAdjustStarted = block.timestamp; // shorter blocktime of attempted readjustment
     uint public _BLOCKS_PER_READJUSTMENT = 16; // should be 1024
     //a little number
     
@@ -551,8 +550,9 @@ contract zkBitcoin is Ownable, IERC20 {
     uint public give0x = 0;
     uint public give = 1;
     uint public sentToLP = 0;
+    uint public multipler = 0;
     // metadata
-    string public name = "ZK Bitcoin Token";
+    string public name = "zk Bitcoin Token";
     string public constant symbol = "zkBTC";
     uint8 public constant decimals = 18;
 	
@@ -568,7 +568,7 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 
 
-	function zinit(address AuctionAddress2, address LPGuild2, address LPGuild3) public onlyOwner{
+	function zinit(address AuctionAddress2, address LPGuild) public onlyOwner{
 		uint x = 21000000000000000000000000; 
 		// Only init once
 		assert(!initeds);
@@ -592,9 +592,8 @@ contract zkBitcoin is Ownable, IERC20 {
 		
 	    	AddressAuction = AuctionAddress2;
 		AuctionsCT = zkBTCAuctionsCT(AddressAuction);
-		AddressLPReward = payable(LPGuild2);
-		AddressLPReward2 = payable(LPGuild3);
-			slowBlocks = 1;
+		AddressLPReward = payable(LPGuild);
+		slowBlocks = 1;
 		oldecount = epochCount;
 		
 		setOwner(address(0));
@@ -638,10 +637,7 @@ contract zkBitcoin is Ownable, IERC20 {
 		balances[AddressLPReward] = balances[AddressLPReward].add(totalOwedABAS);
 		emit Transfer(address(0), AddressLPReward, totalOwedABAS);
 
-		balances[AddressLPReward2] = balances[AddressLPReward2].add(totalOwedABAS);
-		emit Transfer(address(0), AddressLPReward2, totalOwedABAS);
-
-		sentToLP = sentToLP.add(totalOwedABAS * 2);
+		sentToLP = sentToLP.add(totalOwedABAS);
 
 		if( address(this).balance > (200 * (Token2Per * _BLOCKS_PER_READJUSTMENT)/4)){  // at least enough blocks to rerun this function for both LPRewards and Users
 			//IERC20(AddressZeroXBTC).transfer(AddressLPReward, ((epochsPast) * totalOwed * Token2Per * give0xBTC).div(100000000));
@@ -1429,7 +1425,7 @@ contract zkBitcoin is Ownable, IERC20 {
 * MIT License
 * ===========
 *
-* Copyright (c) 2023 Zero Knowledge Bitcoin (zkBTC)
+* Copyright (c) 2023 Zero Knowledge Bitcoin (zkBTC) Token
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -1448,4 +1444,3 @@ contract zkBitcoin is Ownable, IERC20 {
 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 */
-
