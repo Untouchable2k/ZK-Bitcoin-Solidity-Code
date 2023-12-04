@@ -27,9 +27,9 @@ NEED TO CHANGE mintToJustABAS to MintJustzkBTC function name, keeping the same f
 // Symbol: zkBTC
 // Decimals: 18
 //
-// Total supply: 73,500,001.000000000000000000
+// Total supply: 52,500,001.000000000000000000
 //   =
-// 42,000,000 tokens goes to Liquidity Providers of the token over 100+ year using Bitcoin distribution!  Helps prevent LP losses!  Uses the zkBTCRewards1 & zkBTCRewards2 Contract!
+// 21,000,000 tokens goes to Liquidity Providers of the token over 100+ year using Bitcoin distribution!  Helps prevent LP losses!  Uses the zkBTCRewards1 & zkBTCRewards2 Contract!
 //   +
 // 21,000,000 Mined over 100+ years using Bitcoins Distrubtion halvings every 4 years @ 360 min solves. Uses Proof-oF-Work to distribute the tokens. Public Miner is available.  Uses this contract.
 //   +
@@ -37,8 +37,8 @@ NEED TO CHANGE mintToJustABAS to MintJustzkBTC function name, keeping the same f
 //  
 //
 //      
-// 33% of the Ethereum from this contract goes to the Miner to pay for the transaction cost and if the token grows enough earn Ethereum per mint!
-// 66% of the Ethereum from this contract goes to the Liquidity Providers via zkBTCRewards Contract.  Helps prevent Impermant Loss! Larger Liquidity!
+// 50% of the Ethereum from this contract goes to the Miner to pay for the transaction cost and if the token grows enough earn Ethereum per mint!
+// 50% of the Ethereum from this contract goes to the Liquidity Providers via zkBTCRewards Contract.  Helps prevent Impermant Loss! Larger Liquidity!
 //
 // No premine, dev cut, or advantage taken at launch. Public miner available at launch.  100% of the token is given away fairly over 100+ years using Bitcoins model!
 //
@@ -518,11 +518,11 @@ contract zkBitcoin is Ownable, IERC20 {
 
 // Managment events
     mapping(bytes32 => bytes32) public solutionForChallenge;
-    uint256 override public totalSupply = 73500001000000000000000000;
+    uint256 override public totalSupply = 52500001000000000000000000;
     bytes32 private constant BALANCE_KEY = keccak256("balance");
     //BITCOIN INITALIZE Start
 	
-    uint _totalSupply = 21000000000000000000000000;
+    uint constant _totalSupply = 21000000000000000000000000;
     uint public latestDifficultyPeriodStarted2 = block.timestamp; //BlockTime of last readjustment
     uint public epochCount = 0;//number of 'blocks' mined
     uint public latestreAdjustStarted = block.timestamp; // shorter blocktime of attempted readjustment
@@ -561,7 +561,7 @@ contract zkBitcoin is Ownable, IERC20 {
     bool initeds = false;
     
 
-    // mint 1 token to setup LPs
+	// mint 1 token to setup LPs
 	constructor() {
 		balances[msg.sender] = 1000000000000000000;
 		emit Transfer(address(0), msg.sender, 1000000000000000000);
@@ -626,10 +626,10 @@ contract zkBitcoin is Ownable, IERC20 {
 		uint256 ratio = x * 100 / 888;
 		uint256 totalOwed;
 		
-		 if(ratio < 2000){
+		 if(ratio < 3000){
 			totalOwed = (508606*(15*x**2)).div(888 ** 2)+ (9943920 * (x)).div(888);
 		 }else {
-			totalOwed = (3200000000);
+			totalOwed = (24*x*5086060).div(888)+3456750000;
 		} 
 
 		uint totalOwedABAS = (epochsPast * reward_amount * totalOwed).div(100000000);
@@ -639,15 +639,16 @@ contract zkBitcoin is Ownable, IERC20 {
 
 		sentToLP = sentToLP.add(totalOwedABAS);
 
+
 		if( address(this).balance > (200 * (Token2Per * _BLOCKS_PER_READJUSTMENT)/4)){  // at least enough blocks to rerun this function for both LPRewards and Users
-			//IERC20(AddressZeroXBTC).transfer(AddressLPReward, ((epochsPast) * totalOwed * Token2Per * give0xBTC).div(100000000));
-          		address payable to = payable(AddressLPReward);
-			
+			address payable to = payable(AddressLPReward);
 			uint toSendAmt = ((epochsPast) * totalOwed * Token2Per * give0x).div(100000000);
 			
+			if(ratio > 2000){
+				toSendAmt = ((epochsPast) * 320 * Token2Per * give0x).div(10);
+			}
+
 			payable(to).call{value: toSendAmt}("");
-			//	 to.transfer(((epochsPast) * totalOwed * Token2Per * give0x).div(100000000));
-           	//	 to2.transfer(((epochsPast) * totalOwed * Token2Per * give0x).div(100000000));
            		give0x = 1 * give;
 		}else{
 			give0x = 0;
@@ -690,6 +691,7 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 
 
+
 	function mintNFT1155(address nftaddy, uint nftNumber, uint256 nonce, bytes32 challenge_digest) public returns (bool success) {
 		require(mintNFTGO() == 0, "Only mint on slowBlocks % _BLOCKS_PER_READJUSTMENT/8 == 0");
 		mintTo(nonce, challenge_digest, msg.sender);
@@ -699,6 +701,7 @@ contract zkBitcoin is Ownable, IERC20 {
 		}
 		return true;
 	}
+
 
 
 	function mintTo(uint256 nonce, bytes32 challenge_digest, address mintToAddress) public payable returns (uint256 totalOwed) {
@@ -729,12 +732,12 @@ contract zkBitcoin is Ownable, IERC20 {
 		//best @ 3000 ratio totalOwed / 100000000 = 71.6
 		if(ratio < 3000){
 			totalOwed = (508606*(15*x**2)).div(888 ** 2)+ (9943920 * (x)).div(888);
-			require(msg.value >= ((1 * 10**15) / ((ratio+10)/10)), "Must send more ETH because requires eth, check howMuchETH() function to find amount needed");
+			require(msg.value >= ((1 * 10**15) / (((ratio+10)/10) *2) ), "Must send more ETH because requires eth, check howMuchETH() function to find amount needed");
 		}else {
 			totalOwed = (24*x*5086060).div(888)+3456750000;
 			if(ratio < 6000){
 				uint ratioETH = ratio - 2995;
-				require(msg.value >= ((1 * 10**15) / (((ratioETH+10) / 10) * 500)), "Must send more ETH because requires eth until 60x targetTime, check howMuchETH() function to find amount needed");
+				require(msg.value >= ((1 * 10**15) / ( ((ratioETH+10) / 10) * 500)), "Must send more ETH because requires eth until 60x targetTime, check howMuchETH() function to find amount needed");
 			}
 		}
 
@@ -799,6 +802,7 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 
 
+
 	function mintToJustABAS(uint256 nonce, bytes32 challenge_digest, address mintToAddress) public payable returns (uint256 totalOwed) {
 
 		bytes32 digest =  keccak256(abi.encodePacked(challengeNumber, msg.sender, nonce));
@@ -827,7 +831,7 @@ contract zkBitcoin is Ownable, IERC20 {
 		//best @ 3000 ratio totalOwed / 100000000 = 71.6
 		if(ratio < 3000){
 			totalOwed = (508606*(15*x**2)).div(888 ** 2)+ (9943920 * (x)).div(888);
-			require(msg.value >= ((1 * 10**15) / ((ratio+10)/10)), "Must send more ETH because requires eth, check howMuchETH() function to find amount needed");
+			require(msg.value >= ((1 * 10**15) / (((ratio+10)/10) *2)), "Must send more ETH because requires eth, check howMuchETH() function to find amount needed");
 		}else {
 			totalOwed = (24*x*5086060).div(888)+3456750000;
 			if(ratio < 6000){
@@ -893,7 +897,7 @@ contract zkBitcoin is Ownable, IERC20 {
 
 		return totalOd;
 
-    }
+	}
 
 
 
@@ -949,12 +953,18 @@ contract zkBitcoin is Ownable, IERC20 {
 			slowBlocks = slowBlocks.add(1);
 			
 		}
+
 		if(ratio < 3000){
 			totalOwed = (508606*(15*x**2)).div(888 ** 2)+ (9943920 * (x)).div(888);
+			require(msg.value >= ((1 * 10**15) / (((ratio+10)/10) *2)), "Must send more ETH because requires eth, check howMuchETH() function to find amount needed");
 		}else {
 			totalOwed = (24*x*5086060).div(888)+3456750000;
-			
+			if(ratio < 6000){
+				ratio = ratio - 2995;
+				require(msg.value >= ((1 * 10**15) / (((ratio+10) / 10) * 500)), "Must send more ETH because requires eth until 60x targetTime, check howMuchETH() function to find amount needed");
+			}
 		}
+
 
 		uint256 TotalOwned;
 		for(uint z=0; z<xy; z++)
@@ -1021,6 +1031,7 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 	
 
+
 	function blocksToReadjust() public view returns (uint blocks){
 		if((epochCount - epochOld) == 0){
 			if(give == 1){
@@ -1058,7 +1069,7 @@ contract zkBitcoin is Ownable, IERC20 {
 			if(rewardEra < 8){
 				targetTime = ((12 * 60) * 2**rewardEra);
 				if(rewardEra < 6){
-                    _MINIMUM_TARGET = _MINIMUM_TARGET / 2;
+                    			_MINIMUM_TARGET = _MINIMUM_TARGET / 2;
 
 					if(_BLOCKS_PER_READJUSTMENT <= 16){
 						_BLOCKS_PER_READJUSTMENT = 8;
@@ -1142,6 +1153,7 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 
 
+
 	function _reAdjustDifficulty() internal {
 		uint256 blktimestamp = block.timestamp;
 		uint TimeSinceLastDifficultyPeriod2 = blktimestamp - latestDifficultyPeriodStarted2;
@@ -1180,7 +1192,7 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 
 
-//Stat Functions
+	//Stat Functions
 
 	function inflationMined () public view returns (uint YearlyInflation, uint EpochsPerYear, uint RewardsAtTime, uint TimePerEpoch){
 		if(epochCount - epochOld == 0){
@@ -1199,6 +1211,7 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 
 	
+
 	function toNextEraDays () public view returns (uint daysToNextEra, uint _maxSupplyForEra, uint _tokensMinted, uint amtDaily){
 
         (uint totalamt,,,) = inflationMined();
@@ -1211,6 +1224,7 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 	
 
+
 	function toNextEraEpochs () public view returns ( uint epochs, uint epochTime, uint daysToNextEra){
 		if(blocksFromReadjust() == 0){
 			return (0,0,0);
@@ -1222,6 +1236,7 @@ contract zkBitcoin is Ownable, IERC20 {
 		uint amt = daysz * (60*60*24) / timePerEpoch;
 		return (amt, timePerEpoch, daysz);
 	}
+
 
 	//help debug mining software
 	function checkMintSolution(uint256 nonce, bytes32 challenge_digest, bytes32 challenge_number, uint testTarget) public view returns (bool success) {
@@ -1260,13 +1275,17 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 
 
+
 	function getMiningMinted() public view returns (uint) {
 		return tokensMinted;
 	}
 
+
+
 	function getCirculatingSupply() public view returns (uint) {
 		return tokensMinted + sentToLP + AuctionsCT.totalAuctioned();
 	}
+	
 	//21m coins total
 	//reward begins at 150 and is cut in half every reward era (as tokens are mined)
 	function getMiningReward() public view returns (uint) {
@@ -1278,7 +1297,8 @@ contract zkBitcoin is Ownable, IERC20 {
 		}else{
 			return ( 20 * 10**uint(decimals)).div( 2**(rewardEra - 7  ) );
 		}
-		}
+	}
+
 
 
 	function getEpoch() public view returns (uint) {
@@ -1410,17 +1430,17 @@ contract zkBitcoin is Ownable, IERC20 {
 	}
 
 
-
-
 	  //Allow ETH to enter
 	receive() external payable {
 
 	}
 
 
+
 	fallback() external payable {
 
 	}
+
 }
 
 /*
